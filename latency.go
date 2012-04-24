@@ -25,6 +25,7 @@ type tracker struct {
 	stop    chan ident
 	start   chan startReq
 	reports chan LatencyReport
+	ticker  <-chan time.Time
 }
 
 func (t *tracker) Track() Reporter {
@@ -35,7 +36,6 @@ func (t *tracker) Track() Reporter {
 }
 
 func (t *tracker) run() {
-	ticker := time.NewTicker(30 * time.Second)
 	var req startReq
 	var id ident
 	for {
@@ -49,7 +49,7 @@ func (t *tracker) run() {
 			lat := time.Now().UTC().Sub(t.started[id])
 			delete(t.started, id)
 			t.lat[lat]++
-		case <-ticker.C:
+		case <-t.ticker:
 			report := t.lat
 			t.lat = make(map[time.Duration]int)
 			t.reports <- report
@@ -57,13 +57,14 @@ func (t *tracker) run() {
 	}
 }
 
-func NewTracker(reports chan LatencyReport) Tracker {
+func NewTracker(reports chan LatencyReport, ticker <-chan time.Time) Tracker {
 	t := &tracker{
 		started: make(map[ident]time.Time),
 		lat:     make(map[time.Duration]int),
 		stop:    make(chan ident),
 		start:   make(chan startReq),
 		reports: reports,
+		ticker:  ticker,
 	}
 	go t.run()
 	return t

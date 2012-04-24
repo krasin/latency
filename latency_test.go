@@ -2,11 +2,14 @@ package latency
 
 import (
 	"testing"
+	"time"
 )
 
 func TestOneRequest(t *testing.T) {
 	reports := make(chan LatencyReport)
-	lat := NewTracker(reports)
+	ticker := time.NewTicker(20 * time.Millisecond)
+	defer ticker.Stop()
+	lat := NewTracker(reports, ticker.C)
 	track := lat.Track()
 	track()
 	report := <-reports
