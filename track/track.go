@@ -21,6 +21,6 @@ func init() {
 	go logReports()
 }
 
-func Track() Reporter {
+func Track() latency.Reporter {
 	return defaultTracker.Track()
 }
