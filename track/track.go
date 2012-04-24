@@ -9,17 +9,22 @@ import (
 )
 
 var reports = make(chan latency.LatencyReport)
-var ticker = time.NewTicker(30 * time.Second).C
+var span = 30 * time.Second
+var ticker = time.NewTicker(span).C
 
 var defaultTracker = latency.NewTracker(reports, ticker)
 
 type LatencyReport struct {
+	QPS       float64
 	LatencyMs map[string]int
 }
 
 func logReports() {
 	for report := range reports {
-		lr := LatencyReport{LatencyMs: make(map[string]int)}
+		lr := LatencyReport{
+			QPS:       float64(100*len(report)/int(span.Seconds())) / 100,
+			LatencyMs: make(map[string]int),
+		}
 		for lat, count := range report {
 			lr.LatencyMs[fmt.Sprintf("%d", lat.Nanoseconds()/1000/1000)] = count
 		}
