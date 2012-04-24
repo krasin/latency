@@ -41,6 +41,10 @@ func (t *tracker) Stop() {
 	t.stop <- true
 }
 
+func roundLat(d, unit time.Duration) time.Duration {
+	return ((d + unit/2) / unit) * unit
+}
+
 func (t *tracker) run() {
 	var req startReq
 	var id ident
@@ -52,7 +56,7 @@ func (t *tracker) run() {
 			t.started[id] = time.Now().UTC()
 			req.resp <- id
 		case id = <-t.finish:
-			lat := time.Now().UTC().Sub(t.started[id])
+			lat := roundLat(time.Now().UTC().Sub(t.started[id]), 10*time.Millisecond)
 			delete(t.started, id)
 			t.lat[lat]++
 		case <-t.ticker:

@@ -17,6 +17,7 @@ func main() {
 		req(1 * time.Second)
 		req(10 * time.Second)
 		req(2 * time.Second)
+		req(2010 * time.Millisecond)
 	}
 
 }
