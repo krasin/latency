@@ -25,7 +25,7 @@ func logReports() {
 	for report := range reports {
 		lr := LatencyReport{
 			Instance:  instanceId,
-			QPS:       float64(100*len(report)/int(span.Seconds())) / 100,
+			QPS:       float64((100*len(report))/int(span.Seconds())) / 100,
 			LatencyMs: make(map[string]int),
 		}
 		for lat, count := range report {
