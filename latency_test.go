@@ -10,6 +10,7 @@ func TestOneRequest(t *testing.T) {
 	ticker := time.NewTicker(20 * time.Millisecond)
 	defer ticker.Stop()
 	lat := NewTracker(reports, ticker.C)
+	defer lat.Stop()
 	track := lat.Track()
 	track()
 	report := <-reports
