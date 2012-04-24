@@ -25,12 +25,14 @@ func logReports() {
 	for report := range reports {
 		lr := LatencyReport{
 			Instance:  instanceId,
-			QPS:       float64((100*len(report))/int(span.Seconds())) / 100,
 			LatencyMs: make(map[string]int),
 		}
+		total := 0
 		for lat, count := range report {
+			total += count
 			lr.LatencyMs[fmt.Sprintf("%d", lat.Nanoseconds()/1000/1000)] = count
 		}
+		lr.QPS = float64((100*total)/int(span.Seconds())) / 100
 		data, err := json.Marshal(lr)
 		if err != nil {
 			// TODO: do not emit incorrect json in case if error contains `"`.
