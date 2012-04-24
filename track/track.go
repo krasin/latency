@@ -14,14 +14,14 @@ var ticker = time.NewTicker(30 * time.Second).C
 var defaultTracker = latency.NewTracker(reports, ticker)
 
 type LatencyReport struct {
-	Latency map[string]int
+	LatencyMs map[string]int
 }
 
 func logReports() {
 	for report := range reports {
-		lr := LatencyReport{Latency: make(map[string]int)}
+		lr := LatencyReport{LatencyMs: make(map[string]int)}
 		for lat, count := range report {
-			lr.Latency[fmt.Sprintf("%s", lat)] = count
+			lr.LatencyMs[fmt.Sprintf("%d", lat.Nanoseconds()/1000/1000)] = count
 		}
 		data, err := json.Marshal(lr)
 		if err != nil {
